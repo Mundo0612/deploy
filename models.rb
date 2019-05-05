@@ -101,7 +101,6 @@ class Author
     property :fname, Text
     property :lname, Text
     property :book_id, Integer # get from the book class
-    property :user_id, Integer
     property :created_at, DateTime
 end
 

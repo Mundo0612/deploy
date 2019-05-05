@@ -2,6 +2,20 @@ require "sinatra"
 require 'sinatra/flash'
 require_relative "authentication.rb"
 require_relative "initializeDB.rb"
+require 'openssl'
+
+def get_users_json()
+	my_hash = {}
+	my_JSON = [] #@my_JSON = []
+	us = User.all()
+	us.each do |u|
+		my_hash = {:id => u.id,
+			:email => u.email,
+			}
+		my_JSON << JSON.generate(my_hash)
+	end
+	return my_JSON
+end
 
 get "/" do
 	erb :index
@@ -29,35 +43,29 @@ end
 
 get "/users" do
 	authenticate!
-	my_hash = {}
-	my_JSON = []
-	us = User.all()
-	us.each do |u|
-		my_hash = {:id => u.id,
-			:email => u.email,
-			}
-		my_JSON << JSON.generate(my_hash)
-	end
-	return my_JSON
+	@users = User.all
+	erb :"datalist/users"
 end
 
 get "/students" do
 	authenticate!
 	my_hash = {}
 	my_JSON = []
-	st = Student.all()
-	st.each do |s|
-		my_hash = {:id => s.id,
-			:fname => s.fname,
-			:lname => s.lname,
-			:semester => s.semester,
-			:phone_number => s.phone_number,
-			:email => s.email,
-			:user_id => s.user_id,
-			}
-		my_JSON << JSON.generate(my_hash)
-	end
-	return my_JSON
+	@st = Student.all
+	erb :"datalist/students"
+	#st = Student.all
+	#st.each do |s|
+	#	my_hash = {:id => s.id,
+	#		:fname => s.fname,
+	#		:lname => s.lname,
+	#		:semester => s.semester,
+	#		:phone_number => s.phone_number,
+	#		:email => s.email,
+	#		:user_id => s.user_id,
+	#		}
+	#	my_JSON << JSON.generate(my_hash)
+	#end
+	#return my_JSON
 end
 
 get "/students/push" do
@@ -90,8 +98,11 @@ end
 
 get "/delete" do
 	authenticate!
-	erb :"management/delete_all"
-	
+	if (current_user.role_id == 0)
+		erb :"management/delete_all"
+	else
+		return "You are not Admin"
+	end
 end
 
 #This is the delete request but used as a post
@@ -117,7 +128,7 @@ post "/delete/action" do
 	end
 
 	if (neutral && current_user.role_id == 0)
-		word = "Your ID of:#{neutral.id} was deleted"
+		word = "Your ID of: #{neutral.id} was deleted"
 		neutral.destroy
 		return word
 	else 
@@ -129,18 +140,21 @@ get "/employees" do
 	authenticate!
 	my_hash = {}
 	my_JSON = []
-	em = Employee.all()
-		em.each do |e|
-		my_hash = {:id => e.id,
-			:fname => e.fname,
-			:lname => e.lname,
-			:phone_number => e.phone_number,
-			:email => e.email,
-			:user_id => e.user_id,
-			}
-			my_JSON << JSON.generate(my_hash)
-	end
-	return my_JSON # my_JSON.to_json also works
+	@em = Employee.all
+	erb :"datalist/employees"
+
+		
+		#em.each do |e|
+		#my_hash = {:id => e.id,
+		#	:fname => e.fname,
+		#	:lname => e.lname,
+		#	:phone_number => e.phone_number,
+		#	:email => e.email,
+		#	:user_id => e.user_id,
+		#	}
+		#	my_JSON << JSON.generate(my_hash)
+	#end
+	#return my_JSON # my_JSON.to_json also works
 end
 
 get "/employees/push" do
@@ -174,18 +188,19 @@ get "/loans" do
 	authenticate!
 	my_hash = {}
 	my_JSON = []
-	lo = Loan.all()
-	lo.each do |l|
-		my_hash = {:id => l.id,
-			:check_out_date => l.check_out_date,
-			:check_in_date => l.check_in_date,
-			:expected_return_date => l.expected_return_date,
-			:student_id => l.student_id,
-			:book_id => l.book_id,
-			}
-		my_JSON << JSON.generate(my_hash)
-	end
-	return my_JSON
+	@lo = Loan.all
+	erb :"datalist/loans"
+	#lo.each do |l|
+	#	my_hash = {:id => l.id,
+	#		:check_out_date => l.check_out_date,
+	#		:check_in_date => l.check_in_date,
+	#		:expected_return_date => l.expected_return_date,
+	#		:student_id => l.student_id,
+	#		:book_id => l.book_id,
+	#		}
+	#	my_JSON << JSON.generate(my_hash)
+	#end
+	#return my_JSON
 end
 
 get "/loans/push" do
@@ -200,7 +215,7 @@ post "/loans/create" do
 	l.check_in_date = params["check_in_date"]
 	l.expected_return_date = params["expected_return_date"]
 	l.student_id = params["student_id"]
-	l.book_id = params["student_id"]
+	l.book_id = params["book_id"]
 	l.save
 
 	my_hash = {:check_out_date => l.check_out_date,
@@ -218,18 +233,19 @@ get "/donors" do
 	authenticate!
 	my_hash = {}
 	my_JSON = []
-	don = Donor.all()
-	don.each do |d|
-		my_hash = {:id => d.id,
-			:fname => d.fname,
-			:lname => d.lname,
-			:phone_number => d.phone_number,
-			:email => d.email,
-			:book_id => d.book_id,
-			}
-		my_JSON << JSON.generate(my_hash)
-	end
-	return my_JSON
+	@don = Donor.all
+	erb :"datalist/donors"
+	#don.each do |d|
+	#	my_hash = {:id => d.id,
+	#		:fname => d.fname,
+	#		:lname => d.lname,
+	#		:phone_number => d.phone_number,
+	#		:email => d.email,
+	#		:book_id => d.book_id,
+	#		}
+	#	my_JSON << JSON.generate(my_hash)
+	#end
+	#return my_JSON
 end
 
 get "/donors/push" do
@@ -262,20 +278,21 @@ get "/books" do
 	authenticate!
 	my_hash = {}
 	my_JSON = []
-	bo = Book.all()
-	bo.each do |b|
-		my_hash = {:id => b.id,
-			:title => b.title,
-			:edition => b.edition,
-			:condition => b.condition,
-			:author => b.author,
-			:cost => b.cost,
-			:isbn => b.isbn,
-			:book_id => b.book_id,
-			}
-		my_JSON << JSON.generate(my_hash)
-	end
-	return my_JSON
+	@bo = Book.all()
+	erb :"datalist/books"
+	#bo.each do |b|
+	#	my_hash = {:id => b.id,
+	#		:title => b.title,
+	#		:edition => b.edition,
+	#		:condition => b.condition,
+	#		:author => b.author,
+	#		:cost => b.cost,
+	#		:isbn => b.isbn,
+	#		:book_id => b.book_id,
+	#		}
+	#	my_JSON << JSON.generate(my_hash)
+	#end
+	#return my_JSON
 end
 
 get "/books/push" do
@@ -312,17 +329,18 @@ get "/authors" do
 	authenticate!
 	my_hash = {}
 	my_JSON = []
-	au = Author.all()
-	au.each do |a|
-		my_hash = {:id => a.id,
-			:fname => a.fname,
-			:lname => a.lname,
-			:book_id => a.book_id,
-			:user_id => a.user_id,
-		}
-	my_JSON << JSON.generate(my_hash)
-	end
-	return my_JSON
+	@au = Author.all
+	erb :"datalist/authors"
+	#au.each do |a|
+	#	my_hash = {:id => a.id,
+	#		:fname => a.fname,
+	#		:lname => a.lname,
+	#		:book_id => a.book_id,
+	#		:user_id => a.user_id,
+	#	}
+	#my_JSON << JSON.generate(my_hash)
+	#end
+	#return my_JSON
 end
 
 
@@ -337,13 +355,11 @@ post "/authors/create" do
 	a.fname = params["fname"]
 	a.lname = params["lname"]
 	a.book_id = params["book_id"]
-	a.user_id = params["user_id"]
 	a.save
 
 	my_hash = {:fname => a.fname,
 				:lname => a.lname,
 				:book_id => a.book_id,
-				:user_id => a.user_id,
 				}
 	my_JSON = JSON.generate(my_hash)
 

@@ -64,7 +64,6 @@ if (Author.all().count == 0)
 	a.fname = "Admin"
 	a.lname = "Author"
 	a.book_id = 1
-	a.user_id = 1
 	a.save
 end
 
