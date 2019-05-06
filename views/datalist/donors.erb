@@ -1,4 +1,23 @@
-<% @don.each do |d| %>
-	ID: <%= d.id %>, User: <%= d.email %>, 
-	First: <%= d.fname %>, Last: <%= d.lname %><br/>
-<% end %>
+<br/>
+
+<table class="table table-striped table-dark">
+  <thead class="thead-dark">
+    <tr>
+      <th scope="col">ID</th>
+      <th scope="col">User</th>
+      <th scope="col">First</th>
+      <th scope="col">Last</th>
+    </tr>
+  </thead>
+
+    <tbody>
+   <% @don.each do |d| %>
+    <tr>
+      <th scope="row"> <%= d.id %> </th>
+      <td> <%= d.email %> </td>
+      <td> <%= d.fname %> </td>
+      <td> <%= d.lname %> </td>
+    </tr>
+        <% end %>
+     </tbody>
+</table>

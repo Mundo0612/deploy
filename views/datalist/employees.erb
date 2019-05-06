@@ -1,4 +1,23 @@
-<% @em.each do |e| %>
-	ID: <%= e.id %>, User: <%= e.email %>, 
-	First: <%= e.fname %>, Last: <%= e.lname %><br/>
-<% end %>
+<br/>
+
+<table class="table table-striped table-dark">
+  <thead class="thead-dark">
+    <tr>
+      <th scope="col">ID</th>
+      <th scope="col">User</th>
+      <th scope="col">First</th>
+      <th scope="col">Last</th>
+    </tr>
+  </thead>
+
+    <tbody>
+   <% @em.each do |e| %>
+    <tr>
+      <th scope="row"> <%= e.id %> </th>
+      <td> <%= e.email %> </td>
+      <td> <%= e.fname %> </td>
+      <td> <%= e.lname %> </td>
+    </tr>
+        <% end %>
+     </tbody>
+</table>

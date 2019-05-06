@@ -1,4 +1,23 @@
-<% @st.each do |s| %>
-	ID: <%= s.id %>, User: <%= s.email %>, 
-	First: <%= s.fname %>, Last: <%= s.lname %><br/>
-<% end %>
+<br/>
+
+<table class="table table-striped table-dark">
+  <thead class="thead-dark">
+    <tr>
+      <th scope="col">ID</th>
+      <th scope="col">User</th>
+      <th scope="col">First</th>
+      <th scope="col">Last</th>
+    </tr>
+  </thead>
+
+    <tbody>
+   <% @st.each do |s| %>
+    <tr>
+      <th scope="row"> <%= s.id %> </th>
+      <td> <%= s.email %> </td>
+      <td> <%= s.fname %> </td>
+      <td> <%= s.lname %> </td>
+    </tr>
+        <% end %>
+     </tbody>
+</table>
